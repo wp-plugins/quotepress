@@ -1,0 +1,73 @@
+<div style="clear:both;">
+    <h1>Creating Quotes</h1>
+    <p style="padding-left: 12px;">When you installed QuotePress a new sidebar menu for QuotePress was created.
+    Select "Add New" from the menu and fill out the form:
+    </p>
+    <ul style="padding-left: 24px;">
+       <li>Title - This is for organizational purposes and will also be displayed above the quote itself</li>
+       <li>Quote - The editor box is where you can put your quote. Feel free to style the quote however you like.</li>
+       <li>Author - The person who the quote is attributed to.</li>
+       <li>Source - Where the quote comes from (book, movie, chat room, etc).</li>
+       <li>ASIN - This is an optional Amazon product code associated with the source.</li>
+    </ul>
+    <p style="padding-left: 12px;"><strong>Note: when setting the feature image you must click "set feature image" on the media manager interface.</strong></p>
+    <p style="padding-left: 12px;">After you setup the quote, press "publish" to save the quote and make it available to your pages, posts, widgets, and mobile apps.</p>
+
+    <h1>Putting Quotes In Posts</h1>
+
+    <h2>The Basic Shortcode</h2>
+    <p style="padding-left: 12px;">Go to your page or post where you want to show a quote.  Enter the <code>[quotepress]</code> shortcode.</p>
+    <p style="padding-left: 12px;">Without any extra parameters, this will display a list of quotes based on the defaults set on the settings page.</p>
+    <p style="padding-left: 12px;">So, to display a list of quotes you would enter:<br/>
+       <pre>
+        [quotepress]
+       </pre>
+    </p>
+    <p style="padding-left: 12px;">To display a specific quote you'll need to specify either the quote ID or the shorthand:<br/>
+       <pre>
+        [quotepress id="14"]
+       </pre>
+       or
+       <pre>
+        [quotepress shorthand="some-name"]
+       </pre>
+    </p>
+
+    <h1>Online Documentation</h1>
+    <p style="padding-left: 12px;">
+    For more information, visit <a href="http://redmine.cybersprocket.com/projects/quotepress/wiki" target="cybersprocket">the QuotePress wiki</a>.
+    </p>
+</div>
+
+<div style="margin: 0px auto; text-align: center; width: 780px; height: 235px;">
+    <div class="optionpack_box" style="height:195px;">
+        <h1>Give Us Some Love!</h1>
+        <p><a href="http://wordpress.org/extend/plugins/quotepress/"><img src="<?php echo QUOTEPRESS_PLUGINURL.'/images/'; ?>star32.png" alt="Rate Us on WordPress" title="Rate Us on WordPress" style="opacity: 0.8; -moz-opacity: 0.8;" class="fade"></a><br/>
+        <strong>Please <a href="http://wordpress.org/extend/plugins/quotepress/">rate us</a>!</strong>
+        </p>
+        <p style="padding-left: 12px;">
+        If we didn't earn 5 stars for <strong>any</strong> reason, <br/>
+        please give us a chance to <a href="http://www.cybersprocket.com/contact-us/">address your concerns</a>.
+        </p>
+
+        <div class="socialmedia-buttons smw_left">
+            <a href="http://www.facebook.com/cyber.sprocket.labs" rel="nofollow" target="_blank"><img src="<?php echo QUOTEPRESS_PLUGINURL.'/images/'; ?>facebook.png" alt="Follow Us on Facebook" title="Follow Us on Facebook" style="opacity: 0.8; -moz-opacity: 0.8;" class="fade"></a>
+            <a href="https://plus.google.com/b/115309553621087035833/" rel="nofollow" target="_blank"><img src="<?php echo QUOTEPRESS_PLUGINURL.'/images/'; ?>googleplus.png" alt="Follow Us on Google+" title="Follow Us on Google+" style="opacity: 0.8; -moz-opacity: 0.8;" class="fade"></a>
+            <a href="http://twitter.com/#!/cybersprocket" rel="nofollow" target="_blank"><img src="<?php echo QUOTEPRESS_PLUGINURL.'/images/'; ?>twitter.png" alt="Follow Us on Twitter" title="Follow Us on Twitter" style="opacity: 0.8; -moz-opacity: 0.8;" class="fade"></a>
+            <a href="http://www.cybersprocket.com/contact-us/" rel="nofollow" target="_blank"><img src="<?php echo QUOTEPRESS_PLUGINURL.'/images/'; ?>email.png" alt="Follow Us on E-mail" title="Follow Us on E-mail" style="opacity: 0.8; -moz-opacity: 0.8;" class="fade"></a>
+        </div>
+
+    </div>
+
+    <div class="optionpack_box" style="height:195px;">
+        <h1>Feature Requests</h1>
+        <p style="padding-left: 12px;">
+        We do accept feature requests for all of our plugins, free ones included. The most requested features will make it into the next version.
+        </p>
+        <p style="padding-left: 12px;">
+        <strong>If you need a special feature NOW, <a href="http://www.cybersprocket.com/contact-us/">contact us</a>!</strong>
+        We offer expedited feature development.<br/>
+        </p>
+    </div>
+</div>
+
