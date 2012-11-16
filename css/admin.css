@@ -4,11 +4,11 @@
  **/
 
  div#icon-QuotePress.icon32 {
-    background: url("../images/icons32.png") no-repeat scroll transparent;
+    background: url("../images/icons32.png") no-repeat scroll 0px 1px transparent;
  }
 
  div#wpwrap div#wpcontent div#wpbody div#wpbody-content div.wrap div#icon-edit.icon32 {
-  background: url("../images/icons32.png") no-repeat scroll transparent;
+    background: url("../images/icons32.png") no-repeat scroll 0px 1px transparent;
 }
 
  /*----------------------------------

@@ -21,8 +21,8 @@ if (defined('QUOTEPRESS_PLUGINDIR')) {
             'name'                  => 'QuotePress',
             'sku'                   => 'QUOTEPRESS',
 
-            'url'                   => 'http://www.cybersprocket.com/products/quotepress/',
-            'support_url'           => 'http://www.cybersprocket.com/products/quotepress/',
+            'url'                   => 'http://www.charlestonsw.com/product/quotepress/',
+            'support_url'           => 'http://www.charlestonsw.com/product/quotepress/',
 
             'basefile'              => QUOTEPRESS_BASENAME,
             'plugin_path'           => QUOTEPRESS_PLUGINDIR,
@@ -43,9 +43,9 @@ if (defined('QUOTEPRESS_PLUGINDIR')) {
             // Licensing and Packages
             //
             'license_obj_name'      => 'none',
-            'url'                   => 'http://www.cybersprocket.com/products/quotepress/',
-            'support_url'           => 'http://redmine.cybersprocket.com/procets/quotepress/',
-            'purchase_url'          => 'http://www.cybersprocket.com/products/quotepress/',
+            'url'                   => 'http://www.charlestonsw.com/product/quotepress/',
+            'support_url'           => 'http://wordpress.org/support/plugin/quotepress',
+            'purchase_url'          => 'http://www.charlestonsw.com/product/quotepress/',
             'has_packages'          => false,
 
 
