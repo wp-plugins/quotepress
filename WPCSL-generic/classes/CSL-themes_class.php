@@ -121,7 +121,7 @@ class wpCSL_themes__quotepress {
             false, 
             __('How should the plugin UI elements look?  Check the <a href="'.
                 $this->support_url.
-                '" target="Cyber Sprocket">documentation</a> for more info.',
+                '" target="CSA">documentation</a> for more info.',
                 WPCSL__quotepress__VERSION),
             $themeArray
         );        
@@ -161,6 +161,7 @@ class wpCSL_themes__quotepress {
         $this->products->columns = $newEntry['columns'];
      }
      
+
     /**************************************
      ** function: assign_user_stylesheet
      **
@@ -173,21 +174,19 @@ class wpCSL_themes__quotepress {
      **     themeFile    string  - if set use this theme v. the database setting
      **
      **/
-    function assign_user_stylesheet($themeFile = '') {
-        
+    function assign_user_stylesheet($themeFile = '',$preRendering = false) {
         // If themefile not passed, fetch from db
         //
         if ($themeFile == '') {
             $themeFile = get_option($this->prefix.'-theme','default') . '.css';
-            
+
         } else {
             // append .css if left off
-            if ((strlen($themeFile) < 4) || substr_compare($themeFile, '.css', -strlen('.css'), strlen('.css')) != 0) {         
+            if ((strlen($themeFile) < 4) || substr_compare($themeFile, '.css', -strlen('.css'), strlen('.css')) != 0) {
                 $themeFile .= '.css';
             }
         }
-        
-        
+
         // go to default if theme file is missing
         //
         if ( !file_exists($this->css_dir.$themeFile)) {
@@ -196,14 +195,14 @@ class wpCSL_themes__quotepress {
 
         // If the theme file exists (after forcing default if necessary)
         // queue it up
-        //        
+        //
         if ( file_exists($this->css_dir.$themeFile)) {
-            wp_deregister_style($this->prefix.'_user_header_css');             
-            wp_dequeue_style($this->prefix.'_user_header_css');                
-            if ($this->parent->shortcode_was_rendered) {            
+            wp_deregister_style($this->prefix.'_user_header_css');
+            wp_dequeue_style($this->prefix.'_user_header_css');
+            if ($this->parent->shortcode_was_rendered || $preRendering) {
                 wp_enqueue_style($this->prefix.'_user_header_css', $this->css_url .$themeFile);
-            }            
+            }
             $this->configure_theme($themeFile);
         }
-    }     
+    }  
 }

@@ -3,12 +3,12 @@
 *
 * file: CSL-plugin.php
 *
-* The main Cyber Sprocket library for communicating effectively with 
+* The main library for communicating effectively with 
 * WordPress.   This class manages the related helper classes so we can 
 * share a code libary and reduce code redundancy.
 * 
 ************************************************************************/
-define('WPCSL__quotepress__VERSION', '1.9.2');
+define('WPCSL__quotepress__VERSION', '2.0.13');
 
 // (LC) 
 // These helper files should only be loaded if needed by the plugin
@@ -61,15 +61,17 @@ require_once('CSL-themes_class.php');
 *     * 'prefix' :: A string used to prefix all of the Wordpress
 *       settings for the plugin.
 *
-*     * 'support_url' :; The URL for the support page at Cyber Sprocket Labs
+*     * 'support_url' :; The URL for the support page at WordPress
 *
 *     * 'purchase_url' :: The URL for purchasing the plugin
 *
-*     * 'url' :: The URL for the product page at Cyber Sprocket Labs.
+*     * 'url' :: The URL for the product page for purchases.
 *
 *     * 'has_packages' :: defaults to false, if true that means the main product is
 *       not licensed but we still need the license class to manage add-ons.
 *
+ *    * 'admin_slugs' :: and array (or single string) of valid admin page slugs for this plugin.
+ *
 */
 class wpCSL_plugin__quotepress {
 
@@ -90,7 +92,7 @@ class wpCSL_plugin__quotepress {
         $this->display_settings = true;
         $this->display_settings_collapsed = false;
         $this->show_locale      = true;
-        $this->broadcast_url    = 'http://www.cybersprocket.com/signage/index.php';
+        $this->broadcast_url    = 'http://www.charlestonsw.com/signage/index.php';
         $this->shortcode_was_rendered = false;
         $this->current_admin_page = '';
         $this->prefix           = '';
@@ -111,10 +113,20 @@ class wpCSL_plugin__quotepress {
 
         // Check to see if we are doing an update
         //
-        if (isset($this->on_update)) {
+        if (isset($this->version)) {
             if ($this->version != get_option($this->prefix."-installed_base_version")) {
-                call_user_func_array($this->on_update, array($this, get_option($this->prefix."-installed_base_version")));
+                if (isset($this->on_update)) {
+                    call_user_func_array($this->on_update, array($this, get_option($this->prefix."-installed_base_version")));
+                }
                 update_option($this->prefix.'-installed_base_version', $this->version);
+
+                $destruct_time = get_option($this->prefix."-notice-countdown");
+
+                // We're doing an update, so check to see if they didn't check the check box,
+                // and if they didn't... well, show it to them again
+                if ($destruct_time) {
+                    delete_option($this->prefix."-notice-countdown");
+                }
             }
         }
 
@@ -122,6 +134,7 @@ class wpCSL_plugin__quotepress {
         // or we are processing the update action sent from this page
         //        
         $this->isOurAdminPage = ($this->current_admin_page == $this->prefix.'-options');
+
         if (!$this->isOurAdminPage) {
             $this->isOurAdminPage = 
                  isset($_REQUEST['action']) && 
@@ -129,8 +142,27 @@ class wpCSL_plugin__quotepress {
                  isset($_REQUEST['option_page']) && 
                  (substr($_REQUEST['option_page'], 0, strlen($this->prefix)) === $this->prefix)
                  ;
-        }        
-        
+        }
+
+
+        // This test allows for direct calling of the options page from an
+        // admin page call direct from the sidebar using a class/method
+        // operation.
+        //
+        // To use: pass an array of strings that are valid admin page slugs for
+        // this plugin.  You can also pass a single string, we catch that too.
+        //
+        if ((!$this->isOurAdminPage) && isset($this->admin_slugs)) {
+           if (is_array($this->admin_slugs)) {
+               foreach ($this->admin_slugs as $admin_slug) {
+                $this->isOurAdminPage = ($this->current_admin_page === $admin_slug);
+                if ($this->isOurAdminPage) { break; }
+               }
+           } else {
+               $this->isOurAdminPage = ($this->current_admin_page === $this->admin_slugs);
+           }
+        }
+
         // Debugging Flag
         $this->debugging = (get_option($this->prefix.'-debugging') == 'on');
         
@@ -195,13 +227,28 @@ class wpCSL_plugin__quotepress {
             
         );
 
-        if ($this->cache_obj_name != 'none') {
+        /**
+         * Cache Object Config (if needed)
+         */
+        if  ($this->use_obj_defaults || ($this->cache_obj_name != 'none')) {
             $this->cache_config = array(
                 'prefix' => $this->prefix,
                 'path' => $this->cache_path
             );
-        }            
+        }
+
+        /**
+         * Helper Object Config (if needed)
+         */
+        if  ($this->use_obj_defaults || ($this->helper_obj_name != 'none')) {
+            $this->helper_config = array(
+            'parent'            => $this
+            );
+        }
         
+        /**
+         * License Object Config (if needed)
+         */
         if ($this->has_packages || !$this->no_license) {
             $this->license_config = array(
                 'prefix'        => $this->prefix,
@@ -306,7 +353,7 @@ class wpCSL_plugin__quotepress {
             case 'wpCSL_helper__quotepress':
             case 'default':
             default:
-                $this->helper = new wpCSL_helper__quotepress();
+                $this->helper = new wpCSL_helper__quotepress($this->helper_config);
 
         }
     }    
@@ -844,14 +891,27 @@ class wpCSL_plugin__quotepress {
             if ($destruct_time === true) {
                 //if you want something special to happen to people that did not check
                 // the check box to turn this off, here's the place to do it...
+
                 return;
             }
             
-            $hours_remaining = ceil(($destruct_time - $time) / 60 / 60);
+            $hours_remaining = '';
+
+            $suffix = array('d' => 86400, 'h' => 3600, 'm' => 60,);
+
+            $remainder = abs($destruct_time - $time);
+
+            foreach($suffix as $key => $val) {
+                $$key = floor($remainder/$val);
+                $remainder -= ($$key*$val);
+                $hours_remaining .= ($$key==0) ? '' : $$key . "$key ";
+            }
+
+            $hours_remaining .= $remainder . 's ';
             
         	$this->settings->add_item(
         		'Display Settings',
-        		'Turn off notification', 
+        		'Turn off rate notification', 
         		'thisbox', 
         		'checkbox', 
         		false, 
@@ -866,12 +926,12 @@ class wpCSL_plugin__quotepress {
                     $this->notifications->add_notice(
                         9,
                         sprintf(
-                            __('Help us earn a grant so we can make plugins like '.$this->name.' better! Go to 
-                            <a href="http://www.missionsmallbusiness.com" target="_blank">http://www.missionsmallbusiness.com</a>.  
-                            Search "Cyber Sprocket" and click Vote. Done.  </br> Turn off this message in 
+                            __('Let us know how awesome '.$this->name.' is! Go to 
+                            <a href="'.$this->rate_url.'" target="_blank">the plugin page</a>.  
+                            and rate the plugin.  </br> Turn off this message in 
                             <a href="'.admin_url().'/options-general.php?page='.$this->prefix.'-options#display_settings">Display Settings.</a> 
                             Is something not right? <a href="'.$this->forum_url.'" target="_blank">Let us know.</a>
-                            This message will self destruct in: '.$hours_remaining.' hours',WPCSL__quotepress__VERSION)
+                            This message will self destruct in: '.$hours_remaining.'',WPCSL__quotepress__VERSION)
                             )
                         
         			);
@@ -885,14 +945,16 @@ class wpCSL_plugin__quotepress {
             //is the timer up?
             if ($time >= $destruct_time) {
                 //if the checkbox has been hit, then set to false
-                if ($this->settings->get_item(thisbox)==true) {
-                    update_option($this->prefix."-notice-countdown", false);
+                if ($this->settings->get_item('thisbox')==true) {
+                    $destruct_time = false;
                 }
                 //if not then set it to true
                 else {
-                    update_option($this->prefix."-notice-countdown", true);
+                    $destruct_time = true;
                 }
         	}
+
+            update_option($this->prefix."-notice-countdown", $destruct_time);
         }
     }
 

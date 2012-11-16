@@ -6,8 +6,6 @@
  **
  ** The main settings class.
  **
- ** see: http://redmine.cybersprocket.com/projects/wpmod/wiki/Class_wpCSL_settings
- **
  ** Methods:
  **
  **     __construct         : Overload of the default class instantiation.
@@ -41,7 +39,7 @@ class wpCSL_settings__quotepress {
 
         // Only do this if we are on admin panel
         //
-        if (is_admin() && $this->parent->isOurAdminPage) {
+        if (isset($this->parent) && (is_admin() && $this->parent->isOurAdminPage)) {
             
             // Only show the license section if the plugin settings
             // wants a license module
@@ -89,11 +87,11 @@ class wpCSL_settings__quotepress {
 
                                  <div style="clear:left;">
                                    <div style="width:150px; float:left; text-align: right;
-                                       padding-right: 6px;">CSL IP Addresses:</div>
+                                       padding-right: 6px;">CSA IP Addresses:</div>
                                    <div style="float: left;">' . 
-                                        gethostbyname('cybersprocket.com') . 
+                                        gethostbyname('charlestonsw.com') . 
                                         ' and ' .  
-                                        gethostbyname('license.cybersprocket.com') . 
+                                        gethostbyname('license.charlestonsw.com') . 
                                     '</div>
                                  </div>                                
                                    
@@ -209,25 +207,15 @@ class wpCSL_settings__quotepress {
          return
                         '
                         <div class="cybersprocket-cslbox">
-                        <div class="cybersprocket-csllogo">
-                        <a href="http://www.cybersprocket.com/" target="cslinfo"><img src="'. $this->plugin_url .'/images/CSL_banner_logo.png"/></a>
-                         </div>
                          <div class="cybersprocket-cslinfo">
-                         <h4>This plugin has been brought to you by <a href="http://www.cybersprocket.com"
-                                target="_new">Cyber Sprocket Labs</a></h4>
-                         <p>Cyber Sprocket Labs is a custom software development company.  
-                            We develop desktop, mobile, and web applications for clients large and small  
+                         <h4>This plugin has been brought to you by <a href="http://www.charlestonsw.com"
+                                target="_new">Charleston Software Associates</a></h4>
+                         <p>We develop desktop, mobile, and web applications for clients large and small  
                             from all around the world. We hope our plugin brings you closer to the perfect site.
                             If there is anything we can do to improve our work or if you wish to hire us to customize
                             this plugin please call our Charleston South Carolina headquarters or 
-                            <a href="http://www.cybersprocket.com/contact-us/" target="cyber-sprocket-labs">email us</a>
-                            and let us know.<br/>
-                            <br>
-                            <strong>Cyber Sprocket Is...</strong><br/>
-                            Lobby Jones and a bunch of coders.<br/>
-                            <br/>
-                            <strong>For more information:</strong><br/>
-                            <a href="http://www.cybersprocket.com" target="cyber-sprocket-labs">Please visit our website at www.cybersprocket.com</a>.<br/>
+                            <a href="http://www.charlestonsw.com/mindset/contact-us/" target="csa">email us</a>
+                            and let us know.
                          </p>
                          </div>
                          </div>
@@ -258,8 +246,8 @@ class wpCSL_settings__quotepress {
      **
      ** Return the value of a WordPress option that was saved via the settings interface.
      **/
-    function get_item($name, $default = null) {
-        $option_name = $this->prefix . '-' . $name;
+    function get_item($name, $default = null, $separator='-') {
+        $option_name = $this->prefix . $separator . $name;
         if (!isset($this->$option_name)) {            
             $this->$option_name =
                 ($default == null) ?
@@ -337,6 +325,55 @@ class wpCSL_settings__quotepress {
         }
     }
 
+    /**
+     * Add a simple checkbox to the settings array.
+     *
+     * @param string $section - slug for the parent section
+     * @param string $label - text to appear before the setting
+     * @param string $fieldID - the option value field
+     * @param string $description - the help text under the more icon expansion
+     * @param string $value - the default value to use, overrides get-option(name)
+     * @param boolean $disabled - true if the field is disabled
+     */
+    function add_checkbox($section,$label,$fieldID,$description=null,$value=null,$disabled=false) {
+        $this->add_item(
+                $section,
+                $label,
+                $fieldID,
+                'checkbox',
+                false,
+                $description,
+                null,
+                $value,
+                $disabled
+                );
+    }
+
+    /**
+     * Add a simple text input to the settings array.
+     *
+     * @param string $section - slug for the parent section
+     * @param string $label - text to appear before the setting
+     * @param string $fieldID - the option value field
+     * @param string $description - the help text under the more icon expansion
+     * @param string $value - the default value to use, overrides get-option(name)
+     * @param boolean $disabled - true if the field is disabled
+     */
+    function add_input($section,$label,$fieldID,$description=null,$value=null,$disabled=false) {
+        $this->add_item(
+                $section,
+                $label,
+                $fieldID,
+                'text',
+                false,
+                $description,
+                null,
+                $value,
+                $disabled
+                );
+    }
+
+
     /**------------------------------------
      ** Method: register
      ** 
@@ -374,13 +411,21 @@ class wpCSL_settings__quotepress {
             }
         }        
 
+        // Show the plugin environment and info section on every plugin
+        //
+        if ($this->render_csl_blocks) {
+            $this->sections['Plugin Info']->display();
+        }
+
         // Only render license section if plugin settings
         // asks for it
-        if ($this->has_packages || !$this->no_license) {
-            $this->sections[$this->license_section_title]->header();
-            $this->show_plugin_settings();
-            $this->sections[$this->license_section_title]->footer();
-        }
+        if (isset($this->license_section_title) && (isset($this->sections[$this->license_section_title]))) {
+            if ($this->has_packages || !$this->no_license) {
+                $this->sections[$this->license_section_title]->header();
+                $this->show_plugin_settings();
+                $this->sections[$this->license_section_title]->footer();
+            }
+        }            
 
         // Draw each settings section as defined in the plugin config file
         //
@@ -394,7 +439,6 @@ class wpCSL_settings__quotepress {
         //
         if ($this->render_csl_blocks) {
             $this->sections['Plugin Environment']->display();
-            $this->sections['Plugin Info']->display();
         }
         $this->render_javascript();
         $this->footer();
@@ -407,10 +451,12 @@ class wpCSL_settings__quotepress {
      ** should probably be moved over to the licensing submodule
      **/
     function show_plugin_settings() {
+       $theLicenseKey = get_option($this->prefix.'-license_key');
+
        $license_ok =(  (get_option($this->prefix.'-purchased') == '1')   &&
-                      (get_option($this->prefix.'-license_key') != '')            	    	    
-                          );     
-        
+                      ($theLicenseKey != '')
+                          );
+
         // If has_packages is true that means we have an unlicensed product
         // so we don't want to show the license box
         //
@@ -422,18 +468,22 @@ class wpCSL_settings__quotepress {
                 ((!$license_ok) ?
                     "name=\"{$this->prefix}-license_key\"" :
                     '') .
-                " value=\"". get_option($this->prefix.'-license_key') .
+                " value=\"". $theLicenseKey .
                 "\"". ($license_ok?'disabled' :'') .
                 " />";
-    
+
             if ($license_ok) {
-                $content .= "<input type=\"hidden\" name=\"{$this->prefix}-license_key\" value=\"".
-                    get_option($this->prefix.'-license_key')."\"/>";
-                $content .= '<span><img src="'. $this->plugin_url .
-                    '/images/check_green.png" border="0" style="padding-left: 5px;" ' .
-                    'alt="License validated!" title="License validated!"></span>';
+                $content .=
+                    '<p class="slp_license_info">'.$theLicenseKey.'</p>'        .
+                    '<input type="hidden" name="'.$this->prefix.'-license_key" '.
+                        'value="'.$theLicenseKey.'"/>'                          .
+                    '<span><img src="'. $this->plugin_url                       .
+                              '/images/check_green.png" border="0" '            .
+                              'style="padding-left: 5px;" '                     .
+                              'alt="License validated!" '                       .
+                              'title="License validated!"></span>'              ;
             }
-            
+
             $content .= (!$license_ok) ?
                 ('<span><font color="red"><br/>Without a license key, this plugin will ' .
                     'only function for Admins</font></span>') :
@@ -442,29 +492,52 @@ class wpCSL_settings__quotepress {
                         !get_option($this->prefix.'-purchased')) ?
                 ('<span><font color="red">Your license key could not be verified</font></span>') :
                 '';
-    
+
             if (!$license_ok) {
                 $content .= $this->MakePayPalButton($this->paypal_button_id);
             }
-            
+
             $content .= '<div id="prodsku">sku: ';
             if (isset($this->sku) && ($this->sku != '')) {
                 $content .= $this->sku;
             } else {
-                $content .= 'not set';            
-            }        
+                $content .= 'not set';
+            }
             $content .= '</div>';
-            
 
-            
+
+
         // If we are using has_packages we need to seed our content string
         //
         } else {
             $content ='';
-        }            
-      
-        // List the packages
+        }
+
+        // List Packages
         //
+        $content .= $this->ListThePackages($license_ok);
+
+        // If the main product or packages show the license box
+        // Then show a save button here
+        //
+       $license_ok =(  (get_option($this->prefix.'-purchased') == '1')   &&
+                      (get_option($this->prefix.'-license_key') != '')
+                          );
+        if (!$license_ok) {
+            $content .= '<tr><td colspan="2">' .
+                $this->generate_save_button_string().
+                '</td></tr>';
+        }
+
+        echo $content;
+    }
+
+
+    /**
+     * Create the package license otuput for the admin interface.
+     */
+    function ListThePackages($license_ok = false) {
+        $content = '';
         if (isset($this->parent->license->packages) && ($this->parent->license->packages > 0)) {
             $content .= '<tr valign="top"><td class="optionpack" colspan="2">';
             foreach ($this->parent->license->packages as $package) {
@@ -475,20 +548,7 @@ class wpCSL_settings__quotepress {
             }
             $content .= '</td></tr>';
         }
-        
-        // If the main product or packages show the license box
-        // Then show a save button here
-        //
-       $license_ok =(  (get_option($this->prefix.'-purchased') == '1')   &&
-                      (get_option($this->prefix.'-license_key') != '')            	    	    
-                          );            
-        if (!$license_ok) {
-            $content .= '<tr><td colspan="2">' .
-                $this->generate_save_button_string().
-                '</td></tr>';
-        }
-
-        echo $content;                
+        return $content;
     }
     
     /**------------------------------------
@@ -497,19 +557,19 @@ class wpCSL_settings__quotepress {
      **/
     function EnabledOrBuymeString($mainlicenseOK, $package) {
         $content = '';
-        
+
         // If the main product is licensed or we want to force
-        // the packages list, show the checkbox or buy/validate button. 
+        // the packages list, show the checkbox or buy/validate button.
         //
         if ($mainlicenseOK || $this->has_packages) {
-            
+
             // Check if package is licensed now.
             //
 
             $package->isenabled = (
-                
+
                     $package->force_enabled ||
-                    
+
                     $package->parent->check_license_key(
                         $package->sku,
                         true,
@@ -527,41 +587,45 @@ class wpCSL_settings__quotepress {
             // Upgrade is available if the current package version < the latest available
             // -AND- the current package version is has been set
             $upgrade_available = (
-                        ($installed_version != '') &&                
+                        ($installed_version != '') &&
                         (   get_option($this->prefix.'-'.$package->sku.'-version-numeric') <
                             get_option($this->prefix.'-'.$package->sku.'-latest-version-numeric')
-                        )                        
+                        )
                     );
 
             // Package is enabled, just show that
             //
-            if ($package->isenabled) {
+            if ($package->isenabled && ($package->license_key != '')) {
                 $packString = $package->name . ' is enabled!';
 
                 $content .=
-                    '<div><img src="'. $this->plugin_url .
+                    '<div class="csl_info_package_license">'.
+                    (($package->sku!='')?'SKU: '.$package->sku.'<br/>':'').
+                    (($package->license_key!='')?'License Key: '.$package->license_key.'<br/>':'').
+                    '<img src="'. $this->plugin_url .
                     '/images/check_green.png" border="0" style="padding-left: 5px;" ' .
                     'alt="'.$packString.'" title="'.$packString.'">' .
-                    'Version ' . $installed_version .'</div>'.
+                    (($installed_version != '')?'Version: ' . $installed_version : '') .
+                    '</div>'.
                     '<input type="hidden" '.
                             'name="'.$package->lk_option_name.'" '.
                             ' value="'.$package->license_key.'" '.
                             ' />';
                     ;
-                    
+
                 // OK - the license was verified, this package is valid
                 // but the mainlicense was not set...
                 // go set it.
                 if (!$mainlicenseOK && ($package->license_key != '')) {
-                    update_option($this->prefix.'-purchased',true);   
+                    update_option($this->prefix.'-purchased',true);
                     update_option($this->prefix.'-license_key',$package->license_key);
-                }                      
-                    
+                }
+
             // Package not enabled, show buy button
             //
             }
 
-            if (!$package->isenabled || $upgrade_available) {
+            if (!$package->isenabled || $upgrade_available || ($package->license_key == '')) {
                 if ($package->isenabled && $upgrade_available) {
                     $content .= '<b>There is a new version available: ' . $latest_version . '</b><br>';
                     $content .= $this->MakePayPalButton($package->paypal_upgrade_button_id, $package->help_text);
@@ -572,29 +636,32 @@ class wpCSL_settings__quotepress {
 
                 // Show license entry box if we need to
                 //
-                if ($this->has_packages && !$upgrade_available) {
+                if (
+                        ($this->has_packages && !$upgrade_available) ||
+                        ($package->license_key == '')
+                    ){
                     $content .= "{$package->sku} Activation Key: <input type='text' ".
                             "name='{$package->lk_option_name}'" .
                             " value='' ".
-                            " />";                     
+                            " />";
                     if ($package->license_key != '') {
-                        $content .= 
+                        $content .=
                             "<br/><span class='csl_info'>".
                             "The key {$package->license_key} could not be validated.".
                             "</span>";
                     }
                 }
             }
-            
+
         // Main product not licensed, tell them.
         //
         } else {
             $content .= '<span>You must license the product before you can purchase add-on packages.</span>';
         }
-        
+
         return $content;
     }
-    
+
     /**------------------------------------
      ** method: MakePayPalButton
      **
@@ -606,8 +673,8 @@ class wpCSL_settings__quotepress {
         if ($helptext == '') {
             $helptext = 'Your license key is emailed within minutes of your purchase.<br/>'. 
                   'If you do not receive your license check your spam '.
-                     'folder then <a href="http://www.cybersprocket.com/contact-us/" '.
-                     'target="Cyber Sprocket">Contact us</a>.';
+                     'folder then <a href="http://www.charlestonsw.com/mindsetcontact-us/" '.
+                     'target="csa">Contact us</a>.';
         }
         
         // PayPal Form String

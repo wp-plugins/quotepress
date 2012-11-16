@@ -1,14 +1,14 @@
 <?php
 /*
 Plugin Name: QuotePress
-Plugin URI: http://www.cybersprocket.com/products/quotepress/
+Plugin URI: http://www.charlestonsw.com/product/quotepress/
 Description: Manage and display quotes.
-Version: 0.1
-Author: Cyber Sprocket Labs
-Author URI: http://www.cybersprocket.com
+Version: 0.2
+Author: Charleston Software Associates
+Author URI: http://www.charlestonsw.com
 License: GPL3
 
-Copyright 2012  Cyber Sprocket Labs (info@cybersprocket.com)
+Copyright 2012  Charleston Software Associates (info@charlestonsw.com)
 
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -95,6 +95,9 @@ add_filter('manage_edit-' . QUOTEPRESS_PREFIX . '_quote_columns',array('QUOTEPRE
 
 // Short Codes
 //
+add_shortcode('quote'        ,array('QUOTEPRESS_UserInterface','render_shortcode')  );
+add_shortcode('Quote'        ,array('QUOTEPRESS_UserInterface','render_shortcode')  );
+add_shortcode('QUOTE'        ,array('QUOTEPRESS_UserInterface','render_shortcode')  );
 add_shortcode('quotepress'   ,array('QUOTEPRESS_UserInterface','render_shortcode')  );
 add_shortcode('QUOTEPRESS'   ,array('QUOTEPRESS_UserInterface','render_shortcode')  );
 add_shortcode('Quotepress'   ,array('QUOTEPRESS_UserInterface','render_shortcode')  );
